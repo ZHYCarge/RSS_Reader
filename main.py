@@ -8,10 +8,10 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-async def send_email(subject, message):
+async def send_email(subject,rss_title, message):
     """发送电子邮件"""
     msg = MIMEMultipart()
-    msg['Subject'] = 'RSS小助手' + subject
+    msg['Subject'] = '[RSS小助手]' + f'[{rss_title}]'+subject
     msg['From'] = Config.EMAIL_ADDRESS
     msg['To'] = Config.RECIPIENT_ADDRESS
     msg.attach(MIMEText(message, 'html'))
@@ -55,7 +55,7 @@ async def main():
                     latest_entry = feed.entries[0]
                     Config.RSS_FEEED_TITLE[Config.RSS_FEED_URL[i]] = latest_entry.title
 
-                    logger.info(f"已将链接{Config.RSS_FEED_URL[i]}的第一次主题`{latest_entry.title}`添加到数据中")
+                    logger.info(f"已将RSS主题为{feed.feed.title}的第一次主题`{latest_entry.title}`添加到数据中")
                     # await send_email(latest_entry.title, latest_entry['summary'])
                 else:
                     if Config.RSS_FEEED_TITLE[Config.RSS_FEED_URL[i]] != feed.entries[0].title:
@@ -65,7 +65,7 @@ async def main():
                                 Config.RSS_FEEED_TITLE[Config.RSS_FEED_URL[i]] = feed.entries[0].title
                                 break
                             else:
-                                await send_email(latest_entry.title, latest_entry['summary'])
+                                await send_email(latest_entry.title, feed.feed.title, latest_entry['summary'])
                     else:
                         logger.debug(f"RSS订阅地址：{Config.RSS_FEED_URL[i]}下没有最新信息")
             else:
